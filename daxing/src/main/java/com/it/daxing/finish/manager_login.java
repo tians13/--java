@@ -1,5 +1,6 @@
 package com.it.daxing.finish;
 
+import com.it.daxing.VerificationCode;
 import com.it.daxing.manager_frame;
 
 import java.awt.*;
@@ -21,7 +22,7 @@ public class manager_login extends JFrame{
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	private VerificationCode vcode = new VerificationCode();
 	JTextField co,user;
 	JPasswordField pass;
 	JButton ok;
@@ -65,6 +66,7 @@ public class manager_login extends JFrame{
 		pass.setBounds(150, 100, 150, 30);
 		co.setBounds(150, 150, 150, 30);
 		ok.setBounds(180, 220, 70, 30);
+		vcode.setBounds(310, 145, 100, 40);
 
 		
 		frame.setLayout(null);
@@ -75,7 +77,7 @@ public class manager_login extends JFrame{
 		frame.add(pass);
 		frame.add(co);
 		frame.add(ok);
-
+		frame.add(vcode);
 
 		//按下 “登录”按钮时
 		ok.addActionListener(new ActionListener()
@@ -108,8 +110,24 @@ public class manager_login extends JFrame{
 				    String  strSQL="(Select * from  dbo.manager where Mname='"+jusername+"'And Mpassword='"+jpassword+"' )";
 					ResultSet rs=st.executeQuery(strSQL);
 
+					if (coo.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "请输入验证码!", "提示消息", JOptionPane.WARNING_MESSAGE);
+					} else {
+						if (!isValidCodeRight()) {
+							JOptionPane.showMessageDialog(null, "验证码错误,请重新输入!", "提示消息", JOptionPane.WARNING_MESSAGE);
+						} else {
 
+							if (rs.next()) {
+								new manager_frame();
+								closeThis();
+							} else {
+								JOptionPane.showMessageDialog(null, "用户名不存在或密码错误", "错误!", JOptionPane.ERROR_MESSAGE);
+							}
+							conn.close();
 
+							//关闭数据库连接
+						}
+					}
 				} catch (ClassNotFoundException ex) {
 					System.out.println("没有找到对应的数据库驱动类");
 				} catch (SQLException ex) {
@@ -121,8 +139,18 @@ public class manager_login extends JFrame{
 		);
 
 	}
-
-
+	public boolean isValidCodeRight() {		
+		
+		if(co == null) {
+			return false;
+		}else if(vcode == null) {
+			return true;
+		}else if(vcode.getCode() .equals(co.getText())) {
+			return true;
+		}else 
+			return false;
+	
+}
 	
 	public  void closeThis()//关闭当前界面
 	{

@@ -1,11 +1,14 @@
 package com.it.daxing.finish;
 
+import com.it.daxing.VerificationCode;
 import com.it.daxing.ZC;
 import com.it.daxing.staff_frame;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -19,7 +22,7 @@ public class staff_login extends JFrame {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-
+	private VerificationCode vcode = new VerificationCode();
 	JTextField co;
 	public static JTextField user;
 	JPasswordField pass;
@@ -77,7 +80,7 @@ public class staff_login extends JFrame {
 		co.setBounds(150, 150, 150, 30);
 		ok.setBounds(120, 220, 70, 30);
 		register.setBounds(250, 220, 70, 30);
-
+		vcode.setBounds(310, 145, 100, 40);
 
 		
 		frame.setLayout(null);
@@ -89,7 +92,8 @@ public class staff_login extends JFrame {
 		frame.add(co);
 		frame.add(ok);
 		frame.add(register);
-
+		frame.add(vcode);
+	
 		//按下 “注册”按钮时
 	   register.addActionListener(new ActionListener()
 			   {
@@ -129,10 +133,27 @@ public class staff_login extends JFrame {
 				    String  strSQL="(Select * from  dbo.staff where Pid='"+jusername+"'And Ppassword='"+jpassword+"' )";
 					ResultSet rs=st.executeQuery(strSQL);
 
+					if (coo.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "请输入验证码!", "提示消息", JOptionPane.WARNING_MESSAGE);
+					} else {
+						if (!isValidCodeRight()) {
+							JOptionPane.showMessageDialog(null, "验证码错误,请重新输入!", "提示消息", JOptionPane.WARNING_MESSAGE);
+						}
+						else {
+
+							if (rs.next()) {
+								System.out.println("成功进入窗口了111！\n");
+								new staff_frame();
+								System.out.println("成功进入窗口了999！\n");
+								closeThis();
+							} else {
+								JOptionPane.showMessageDialog(null, "用户名不存在或密码错误", "错误!", JOptionPane.ERROR_MESSAGE);
+							}
+							conn.close();
 
 							//关闭数据库连接
-
-
+						}
+					}
 				}
 				catch (ClassNotFoundException ex) {
 					System.out.println("没有找到对应的数据库驱动类");
@@ -143,8 +164,18 @@ public class staff_login extends JFrame {
 			}
 			});
 	}
-
-
+		public boolean isValidCodeRight() {		
+			
+			if(co == null) {
+				return false;
+			}else if(vcode == null) {
+				return true;
+			}else if(vcode.getCode() .equals(co.getText())) {
+				return true;
+			}else 
+				return false;
+		
+	}
 		
 		
 	public  void closeThis()//关闭当前界面
