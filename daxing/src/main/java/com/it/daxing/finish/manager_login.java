@@ -1,0 +1,134 @@
+package com.it.daxing.finish;
+
+import com.it.daxing.manager_frame;
+
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+import javax.swing.*;
+
+
+public class manager_login extends JFrame{
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+	JTextField co,user;
+	JPasswordField pass;
+	JButton ok;
+
+	public manager_login() {
+		super("总管登陆");
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		this.setSize(450,350);	
+		this.setLocationRelativeTo(null);
+		setVisible(true);
+
+		Image img = Toolkit.getDefaultToolkit().getImage("src\\Image\\寻找熊出没仓库照片 (2).png");
+		// 创建ImagePanel并添加到JFrame
+		ImagePanel frame = new ImagePanel(img);
+	    this.add(frame);
+		
+	    //账号、密码所代表的图形
+	    Icon login = new ImageIcon("D:\\新建文件夹\\user.jpg");
+		JLabel l= new JLabel();
+		l.setIcon(login);		
+		Icon password = new ImageIcon("D:\\新建文件夹\\password.png");
+		JLabel p= new JLabel();
+		p.setIcon(password);
+
+		JLabel code=new JLabel("验证码");
+		code.setForeground(Color.white);
+		code.setFont(new Font("楷体",Font.BOLD,17));
+		
+		user=new JTextField();
+	    pass=new JPasswordField();
+	    co=new JTextField();
+		ok=new JButton("登录");
+		ok.setForeground(Color.white);
+		ok.setContentAreaFilled(false);
+		
+		
+		l.setBounds(80, 50, 60, 40);
+		p.setBounds(80, 100, 60, 40);
+		code.setBounds(70, 150, 60, 40);
+	    user.setBounds(150, 50, 150, 30);
+		pass.setBounds(150, 100, 150, 30);
+		co.setBounds(150, 150, 150, 30);
+		ok.setBounds(180, 220, 70, 30);
+
+		
+		frame.setLayout(null);
+		frame.add(l);
+		frame.add(p);
+		frame.add(code);
+		frame.add(user);
+		frame.add(pass);
+		frame.add(co);
+		frame.add(ok);
+
+
+		//按下 “登录”按钮时
+		ok.addActionListener(new ActionListener()
+				{
+
+			public void actionPerformed(ActionEvent e)
+			{
+				String jusername=user.getText();
+				char s[]=pass.getPassword();
+				String jpassword=new String(s);
+				String coo=co.getText();
+
+				try {
+					String user="sa3";
+					String password="123456";
+					Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+					//加载对应的jdbc驱动
+					String url="jdbc:sqlserver://localhost:1433;DatabaseName=stash;trustServerCertificate=true;";
+					//配置连接字符串
+					/*
+					*登录SQL server数据库时用的账号、密码
+					*
+					* */
+
+					Connection conn=DriverManager.getConnection(url,user,password);
+					//创建数据库连接对象
+					Statement st=conn.createStatement();
+					//创建SQL语句执行对象
+
+				    String  strSQL="(Select * from  dbo.manager where Mname='"+jusername+"'And Mpassword='"+jpassword+"' )";
+					ResultSet rs=st.executeQuery(strSQL);
+
+
+
+				} catch (ClassNotFoundException ex) {
+					System.out.println("没有找到对应的数据库驱动类");
+				} catch (SQLException ex) {
+					System.out.println("数据库连接或者是数据库操作失败");
+				}
+			}
+
+				}
+		);
+
+	}
+
+
+	
+	public  void closeThis()//关闭当前界面
+	{
+		this.dispose();
+	}
+	
+	}
+
+
